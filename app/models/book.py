@@ -10,7 +10,7 @@ class Book(db.Model):
   isbn = db.Column(db.String(20), nullable=False, unique=True)
   publication_date = db.Column(db.Date, nullabl=True)
   price = db.Column(db.Numeric(10, 2), nullable=False)
-  stock = db.Column(db.Integer, default, 0)
+  stock = db.Column(db.Integer, default=0)
   description = db.Column(db.Text, nullable=True)
   updated_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
   created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc), onupdate=lambda: datetime.now(datetime.timezone.utc))
