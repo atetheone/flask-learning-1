@@ -1,7 +1,14 @@
-from flask import Flask, render_template
+from flask import Flask, jsonify
 
-app = Flask(__name__)
+from flaskr import create_app
+
+app = create_app()
+
 
 @app.route("/")
 def hello_world():
-    return render_template("index.html", title="Hello")
+    return jsonify(message="Welcome to this custom api")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
