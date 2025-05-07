@@ -19,29 +19,6 @@ class BookSchema(ma.SQLAlchemySchema):
         """
 
         model = Book
-        book_id = ma.auto_field()
-        title = ma.auto_field()
-        isbn = ma.auto_field()
-        publication_date = ma.auto_field()
-        price = ma.auto_field()
-        stock = ma.auto_field()
-        description = ma.auto_field()
-        created_at = ma.auto_field()
-        updated_at = ma.auto_field()
-
-        # Only include author and publisher IDs in the basic schema
-        _links = ma.Hyperlinks(
-            {
-                "self": ma.URLFor("books.get_book", values=dict(id="<id>")),
-                "author": ma.URLFor(
-                    "authors.get_author", values=dict(id="<author_id>")
-                ),
-                "publisher": ma.URLFor(
-                    "publishers.get_publisher",
-                    values=dict(id="<publisher_id>")
-                ),
-            }
-        )
 
         def get_model_name(self):
             """
@@ -54,6 +31,31 @@ class BookSchema(ma.SQLAlchemySchema):
             Returns a list of fields defined in the schema.
             """
             return [field for field in dir(self) if not field.startswith("_")]
+
+    book_id = ma.auto_field()
+    title = ma.auto_field()
+    isbn = ma.auto_field()
+    publication_date = ma.auto_field()
+    price = ma.auto_field()
+    stock = ma.auto_field()
+    description = ma.auto_field()
+    created_at = ma.auto_field()
+    updated_at = ma.auto_field()
+
+    # Only include author and publisher IDs in the basic schema
+    _links = ma.Hyperlinks(
+        {
+            "self": ma.URLFor("books.get_book", values=dict(book_id="<book_id>")),
+            "author": ma.URLFor(
+                "authors.get_author", values=dict(author_id="<author_id>")
+            ),
+            # "publisher": ma.URLFor(
+            #     "publishers.get_publisher",
+            #     values=dict(publisher_id="<publisher_id>")
+            # ),
+            # publishers routes are not implemented yet
+        }
+    )
 
 
 # More detailed schema that includes nested objects
