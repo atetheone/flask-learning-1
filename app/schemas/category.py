@@ -1,1 +1,45 @@
-c
+"""
+Category Schema
+This module defines the CategorySchema class, which is used for serializing and
+deserializing Category objects.
+"""
+
+from app import ma
+from app.models import Category
+
+
+class CategorySchema(ma.SQLAlchemySchema):
+    """
+    Schema for the Category model, defining fields and hyperlinks.
+    """
+    class Meta:
+        """
+        Meta class for CategorySchema to define model
+        and additional configurations.
+        """
+        model = Category
+
+        def get_model_name(self):
+            """
+            Returns the name of the model.
+            """
+            return self.model.__name__
+
+        def is_model_defined(self):
+            """
+            Checks if the model is defined.
+            """
+            return self.model is not None
+
+    category_id = ma.auto_field()
+    name = ma.auto_field()
+    description = ma.auto_field()
+    created_at = ma.auto_field()
+    updated_at = ma.auto_field()
+
+    _links = ma.Hyperlinks({
+        "self": ma.URLFor("categories.get_category", values=dict(id="<id>")),
+        "books": ma.URLFor(
+            "categories.get_category_books", values=dict(id="<id>")
+        )
+    })

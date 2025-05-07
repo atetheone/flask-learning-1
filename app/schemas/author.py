@@ -1,26 +1,61 @@
-from app import ma
+"""
+Author Schema
+This module defines the AuthorSchema class, which is used for serializing and
+deserializing Author objects. It uses Marshmallow for schema definition and
+validation.
+"""
+
 from app.models import Author
+from app import ma
 from marshmallow import fields
 
+
 class AuthorSchema(ma.SQLAlchemySchema):
-  class Meta:
-    models = Author
-  
-  author_id = ma.auto_field()
-  first_name = ma.auto_field()
-  last_name = ma.auto_field()
-  birth_date = ma.auto_field()
-  biography = ma.auto_field()
-  created_at = ma.auto_field()
-  updated_at = ma.auto_field()
-  
-  full_name = fields.Method("get_full_name")
-  
-  def get_full_name(self, obj):
-    return f"{obj.first_name} {obj.last_name}"
-  
-  # Add url for nested resource
-  _links = ma.Hyperlinks({
-		"self": ma.URLFor("authors.get_author", values=dict(id="<id>")),
-		"books": ma.URLFor("athors.get_author_books", values=dict(id="<id>"))
-	})
+    """
+    Schema for serializing and deserializing Author objects.
+    """
+    class Meta:
+        """
+        Meta class for AuthorSchema.
+        Defines the model associated with this schema.
+        """
+        model = Author
+
+        def get_model_name(self):
+            """
+            Returns the name of the associated model.
+            """
+            return self.models.__name__
+
+        def is_model_defined(self):
+            """
+            Checks if the model is defined.
+            """
+            return self.models is not None
+
+    author_id = ma.auto_field()
+    first_name = ma.auto_field()
+    last_name = ma.auto_field()
+    birth_date = ma.auto_field()
+    biography = ma.auto_field()
+    created_at = ma.auto_field()
+    updated_at = ma.auto_field()
+
+    full_name = fields.Method("get_full_name")
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+    # Add url for nested resource
+    _links = ma.Hyperlinks(
+        {
+            "self": ma.URLFor(
+                "authors.get_author",
+                values=dict(author_id="<author_id>")
+            ),
+            "books": ma.URLFor(
+                "authors.get_author_books",
+                values=dict(author_id="<author_id>")
+            ),
+        }
+    )

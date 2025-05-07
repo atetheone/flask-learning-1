@@ -1,3 +1,6 @@
+"""
+This module imports all the schemas used in the application."""
+
 from app.schemas.author import AuthorSchema
 from app.schemas.book import BookSchema, BookDetailsSchema
 from app.schemas.publisher import PublisherSchema
