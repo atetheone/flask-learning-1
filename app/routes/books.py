@@ -15,7 +15,6 @@ def get_books():
     """Return all books with optional filters and pagination"""
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    category = request.args.get("category")
 
     # Retrieve from db
     books_query = Book.query
@@ -53,14 +52,11 @@ def get_books():
     sort_by = request.args.get('sort_by', 'title')
     sort_order = request.args.get('sort_order', 'asc')
 
-    if sort_by == 'title':
-        sort_column = Book.title
-    elif sort_by == 'price':
-        sort_column = Book.price
-    elif sort_by == 'publication_date':
-        sort_column = Book.publication_date
-    else:
-        sort_column = Book.title
+    sort_column = {
+        'title': Book.title,
+        'price': Book.price,
+        'publication_date': Book.publication_date
+    }.get(sort_by, Book.title)
 
     if sort_order == 'desc':
         books_query = books_query.order_by(sort_column.desc())
@@ -73,10 +69,11 @@ def get_books():
     return jsonify(
         {
             "books": books_schema.dump(pagination.items),
+            # [book_.to_dict() for book_ in books_query.all()],
             "pagination": {
                 "total_items": pagination.total,
                 "total_pages": pagination.pages,
-                "current_page": page,
+                "current_page": pagination.page,
                 "per_page": per_page,
             }
         }
@@ -124,7 +121,7 @@ def create_book():
         description=data.get('description')
     )
 
-    if 'category_ids' in data and isintance(data['category_ids'], list):
+    if 'category_ids' in data and isinstance(data['category_ids'], list):
         for category_id in data['category_ids']:
             category = Category.query.get(category_id)
             if category:
