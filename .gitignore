@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+.coverage # coverage report
+
+
 # C extensions
 *.so
 
@@ -10,10 +13,13 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 *.egg-info/
 dist/
 build/
+Lib
+Scripts
 
 # Flask specific
 instance/
@@ -38,3 +44,5 @@ htmlcov/
 # System files
 .DS_Store
 Thumbs.db
+
+get-pip.py
