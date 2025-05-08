@@ -6,3 +6,4 @@ flask-marshmallow
 python-dotenv
 pytest
 coverage
+pytest-cov
