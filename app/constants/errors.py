@@ -5,7 +5,10 @@ CATEGORY_NOT_FOUND = "Category not found"
 PUBLISHER_NOT_FOUND = "Publisher not found"
 NAME_REQUIRED = "First and last name are required"
 INVALID_CONTENT_TYPE = "Invalid content type, expected JSON"
+INVALID_DATE_FORMAT = "Invalid date format. Expected YYYY-MM-DD."
 MISSING_REQUIRED_FIELD = "Missing required field: {field}"
+DUPLICATE_ISBN = "ISBN already exists. Please use a different ISBN."
+
 
 ERROR_CONNECTION_FAILED = "Unable to connect to the server. Please check your internet connection and try again."
 ERROR_FILE_NOT_FOUND = "The requested file was not found on the system."
