@@ -50,23 +50,23 @@ class Category(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    def __repr__(self):
-        return f"<Category {self.name}>"
+    # def __repr__(self):
+    #     return f"<Category {self.name}>"
 
-    def to_dict(self):
-        """
-        Converts the Category object into a dictionary representation.
+    # def to_dict(self):
+    #     """
+    #     Converts the Category object into a dictionary representation.
 
-        Returns:
-            dict: A dictionary containing the category's details.
-        """
-        return {
-            "category_id": self.category_id,
-            "name": self.name,
-            "description": self.description,
-            "updated_at": self.updated_at,
-            "created_at": self.created_at,
-        }
+    #     Returns:
+    #         dict: A dictionary containing the category's details.
+    #     """
+    #     return {
+    #         "category_id": self.category_id,
+    #         "name": self.name,
+    #         "description": self.description,
+    #         "updated_at": self.updated_at,
+    #         "created_at": self.created_at,
+    #     }
 
     # Relationship
     books = db.relationship(

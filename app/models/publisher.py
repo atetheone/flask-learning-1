@@ -21,5 +21,5 @@ class Publisher(db.Model):
     # Relationship
     books = db.relationship("Book", back_populates="publisher", lazy="dynamic")
 
-    def __repr__(self):
-        return f"<Publisher {self.name}"
+    # def __repr__(self):
+    #     return f"<Publisher {self.name}"

@@ -41,29 +41,29 @@ class Book(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    def __repr__(self):
-        return f"<Book {self.title}>"
+    # def __repr__(self):
+    #     return f"<Book {self.title}>"
 
-    def to_dict(self):
-        """
-        Converts the book instance to a dictionary.
+    # def to_dict(self):
+    #     """
+    #     Converts the book instance to a dictionary.
 
-        Returns:
-            dict: A dictionary representation of the book.
-        """
-        return {
-            "book_id": self.book_id,
-            "title": self.title,
-            "isbn": self.isbn,
-            "publication_date": self.publication_date,
-            "price": float(self.price),
-            "stock": self.stock,
-            "description": self.description,
-            "updated_at": self.updated_at,
-            "created_at": self.created_at,
-            "author_id": self.author_id,
-            "publisher_id": self.publisher_id,
-        }
+    #     Returns:
+    #         dict: A dictionary representation of the book.
+    #     """
+    #     return {
+    #         "book_id": self.book_id,
+    #         "title": self.title,
+    #         "isbn": self.isbn,
+    #         "publication_date": self.publication_date,
+    #         "price": float(self.price),
+    #         "stock": self.stock,
+    #         "description": self.description,
+    #         "updated_at": self.updated_at,
+    #         "created_at": self.created_at,
+    #         "author_id": self.author_id,
+    #         "publisher_id": self.publisher_id,
+    #     }
     author_id = db.Column(
         db.Integer, db.ForeignKey("authors.author_id"), nullable=False
     )

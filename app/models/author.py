@@ -35,5 +35,5 @@ class Author(db.Model):
     # Relationships
     books = db.relationship("Book", back_populates="author", lazy="dynamic")
 
-    def __repr__(self):
-        return f"<Author {self.first_name} {self.last_name}>"
+    # def __repr__(self):
+    #     return f"<Author {self.first_name} {self.last_name}>"
