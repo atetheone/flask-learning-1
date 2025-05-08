@@ -20,18 +20,6 @@ class BookSchema(ma.SQLAlchemySchema):
 
         model = Book
 
-        def get_model_name(self):
-            """
-            Returns the name of the model associated with this schema.
-            """
-            return self.model.__name__
-
-        def get_fields(self):
-            """
-            Returns a list of fields defined in the schema.
-            """
-            return [field for field in dir(self) if not field.startswith("_")]
-
     book_id = ma.auto_field()
     title = ma.auto_field()
     isbn = ma.auto_field()
@@ -41,6 +29,7 @@ class BookSchema(ma.SQLAlchemySchema):
     description = ma.auto_field()
     created_at = ma.auto_field()
     updated_at = ma.auto_field()
+    
 
     # Only include author and publisher IDs in the basic schema
     _links = ma.Hyperlinks(

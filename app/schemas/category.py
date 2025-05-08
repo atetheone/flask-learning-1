@@ -19,18 +19,6 @@ class CategorySchema(ma.SQLAlchemySchema):
         """
         model = Category
 
-        def get_model_name(self):
-            """
-            Returns the name of the model.
-            """
-            return self.model.__name__
-
-        def is_model_defined(self):
-            """
-            Checks if the model is defined.
-            """
-            return self.model is not None
-
     category_id = ma.auto_field()
     name = ma.auto_field()
     description = ma.auto_field()
