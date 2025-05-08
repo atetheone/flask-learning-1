@@ -4,3 +4,5 @@ marshmallow
 marshmallow-sqlalchemy
 flask-marshmallow
 python-dotenv
+pytest
+coverage
