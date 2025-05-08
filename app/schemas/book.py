@@ -45,7 +45,10 @@ class BookSchema(ma.SQLAlchemySchema):
     # Only include author and publisher IDs in the basic schema
     _links = ma.Hyperlinks(
         {
-            "self": ma.URLFor("books.get_book", values=dict(book_id="<book_id>")),
+            "self": ma.URLFor(
+                "books.get_book",
+                values=dict(book_id="<book_id>")
+            ),
             "author": ma.URLFor(
                 "authors.get_author", values=dict(author_id="<author_id>")
             ),
@@ -59,7 +62,7 @@ class BookSchema(ma.SQLAlchemySchema):
 
 
 # More detailed schema that includes nested objects
-class BookDetailsSchema(ma.SQLAlchemySchema):
+class BookDetailsSchema(BookSchema):
     """
     Schema for detailed serialization and deserialization of Book objects,
     including nested author, publisher, and categories.

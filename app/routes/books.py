@@ -5,7 +5,8 @@ This module defines the routes for managing books in the application.
 from flask import Blueprint, jsonify, request
 from app import db
 from app.models import Book, Author, Category, Publisher
-from app.schemas import book_details_schema, books_schema, book_schema
+from app.schemas import books_schema, book_schema
+from app.constants import errors
 
 books_bp = Blueprint("books", __name__)
 
@@ -69,7 +70,6 @@ def get_books():
     return jsonify(
         {
             "books": books_schema.dump(pagination.items),
-            # [book_.to_dict() for book_ in books_query.all()],
             "pagination": {
                 "total_items": pagination.total,
                 "total_pages": pagination.pages,
@@ -83,7 +83,9 @@ def get_books():
 @books_bp.route("/<int:book_id>", methods=["GET"])
 def get_book(book_id: int):
     """Get a specific book"""
-    book = Book.query.get_or_404(book_id)
+    book = db.session.get(Book, book_id)
+    if book is None:
+        return jsonify({"error": errors.BOOK_NOT_FOUND}), 404
     return jsonify(book_schema.dump(book))
 
 
@@ -99,16 +101,19 @@ def create_book():
     for field in required_fields:
         if field not in data:
             return jsonify({'error': f'Missing required field: {field}'}), 400
-    return jsonify({"message": "Book created successfully"}), 201
 
     # Verify author and publisher exist
-    author = Author.query.get(data['author_id'])
+    author = db.session.get(Author, data['author_id'])
     if not author:
-        return jsonify({'error': f'Author with id {data["author_id"]} not found'}), 404
+        return jsonify({
+            'error': errors.AUTHOR_NOT_FOUND
+        }), 404
 
-    publisher = Publisher.query.get(data['publisher_id'])
+    publisher = db.session.get(Publisher, data['publisher_id'])
     if not publisher:
-        return jsonify({'error': f'Publisher with id {data["publisher_id"]} not found'}), 404
+        return jsonify({
+            'error': errors.PUBLISHER_NOT_FOUND
+        }), 404
 
     # Create new book
     book = Book(
@@ -123,23 +128,25 @@ def create_book():
 
     if 'category_ids' in data and isinstance(data['category_ids'], list):
         for category_id in data['category_ids']:
-            category = Category.query.get(category_id)
+            category = db.session.get(Category, category_id)
             if category:
                 book.categories.append(category)
 
     db.session.add(book)
     db.session.commit()
 
-    return jsonify(book_details_schema.dump(book)), 201
+    return jsonify(book_schema.dump(book)), 201
 
 
 @books_bp.route("/<int:book_id>", methods=["PUT"])
 def update_book(book_id: int):
     """Update a book"""
-    book = Book.query.get_or_404(book_id)
+    book = db.session.get(Book, book_id)
+    if book is None:
+        return jsonify({'error': errors.BOOK_NOT_FOUND}), 404
 
     if not request.is_json:
-        return jsonify({'error': 'Invalid content type'}), 415
+        return jsonify({'error': errors.INVALID_CONTENT_TYPE}), 415
 
     data = request.get_json()
 
@@ -158,43 +165,44 @@ def update_book(book_id: int):
         book.description = data['description']
 
     if 'author_id' in data:
-        author = Author.query.get(data['author_id'])
+        author = db.session.get(Author, data['author_id'])
         if not author:
-            return jsonify({'error': f'Author with ID {data["author_id"]} not found'}), 404
+            return jsonify({
+                'error': errors.AUTHOR_NOT_FOUND
+            }), 404
         book.author_id = data['author_id']
 
     if 'publisher_id' in data:
-        publisher = Publisher.query.get(data['publisher_id'])
+        publisher = db.session.get(Publisher, data['publisher_id'])
         if not publisher:
-            return jsonify({'error': f'Publisher with ID {data["publisher_id"]} not found'}), 404
+            return jsonify({
+                'error': errors.PUBLISHER_NOT_FOUND
+            }), 404
         book.publisher_id = data['publisher_id']
 
     if 'category_ids' in data:
         # Clear existing categories
         book.categories = []
         for category_id in data['category_ids']:
-            category = Category.query.get(category_id)
+            category = db.session.get(Category, category_id)
             if not category:
-                return jsonify({'error': f'Category with ID {category_id} not found'}), 404
+                return jsonify({
+                    'error': errors.CATEGORY_NOT_FOUND
+                }), 404
             book.categories.append(category)
 
     db.session.commit()
-    return jsonify(book_details_schema.dump(book))
+    return jsonify(book_schema.dump(book))
 
 
 @books_bp.route("/<int:book_id>", methods=["DELETE"])
 def delete_book(book_id: int):
     """Delete a book"""
-    book = Book.query.get_or_404(book_id)
+    book = db.session.get(Book, book_id)
+    if not book:
+        return jsonify({'error': errors.BOOK_NOT_FOUND}), 404
 
     db.session.delete(book)
     db.session.commit()
 
     return '', 204
-
-
-# Sub-resources
-@books_bp.route("/<int:book_id>/reviews", methods=["GET"])
-def get_book_reviews(book_id: int):
-    """Get reviews for a book"""
-    pass
