@@ -21,18 +21,6 @@ class AuthorSchema(ma.SQLAlchemySchema):
         """
         model = Author
 
-        def get_model_name(self):
-            """
-            Returns the name of the associated model.
-            """
-            return self.models.__name__
-
-        def is_model_defined(self):
-            """
-            Checks if the model is defined.
-            """
-            return self.models is not None
-
     author_id = ma.auto_field()
     first_name = ma.auto_field()
     last_name = ma.auto_field()
