@@ -1,6 +1,7 @@
 import json
 import pytest
 from app.constants import errors
+from datetime import date
 
 
 def test_get_books(client, sample_data):
@@ -19,6 +20,79 @@ def test_get_books(client, sample_data):
     assert "pagination" in retrieved_data
     pagination = retrieved_data["pagination"]
     assert pagination["total_items"] == 2
+
+
+def test_filter_books_by_title(client, sample_data):
+    """Test filtering books by title."""
+    response = client.get('/api/books?title=test')
+    assert response.status_code == 200
+
+    data = json.loads(response.data)
+    assert len(data['books']) == 1
+    assert data['books'][0]['title'] == 'Test Book'
+
+
+def test_filter_books_by_author(client, sample_data):
+    """Test filtering books by author name."""
+    response = client.get('/api/books?author_name=John')
+    assert response.status_code == 200
+
+    data = json.loads(response.data)
+    assert len(data['books']) == 1
+    assert data['books'][0]['title'] == 'Test Book'
+
+
+def test_filter_books_by_category(client, sample_data):
+    """Test filtering books by category ID."""
+    category = sample_data['categories'][2][1]  # Science Fiction
+    response = client.get(f'/api/books?category={category}')
+    assert response.status_code == 200
+
+    data = json.loads(response.data)
+    assert len(data['books']) == 1
+    assert data['books'][0]['title'] == 'Another Book'
+
+
+def test_filter_books_by_publisher(client, sample_data):
+    """Test filtering books by publisher ID."""
+    publisher_id = sample_data['publishers'][0]  # First publisher
+    response = client.get(f'/api/books?publisher_id={publisher_id}')
+    assert response.status_code == 200
+
+    data = json.loads(response.data)
+    assert len(data['books']) == 1
+    assert data['books'][0]['title'] == 'Test Book'
+
+def test_filter_sort_books_by_price(client, sample_data):
+    """Test filtering and sorting books by price."""
+    response = client.get('/api/books?sort_by=price&sort_order=desc')
+    assert response.status_code == 200
+    
+    data = response.get_json()
+    assert len(data['books']) == 2
+    assert data['books'][0]['title'] == 'Another Book'
+    assert data['books'][1]['title'] == 'Test Book'
+
+
+def test_filter_books_by_author_name(client, sample_data):
+    """Test filtering books by author name."""
+    response = client.get('/api/books?author_name=John')
+    assert response.status_code == 200
+
+    data = json.loads(response.data)
+    assert len(data['books']) == 1
+    assert data['books'][0]['title'] == 'Test Book'
+
+
+def test_sorting_books(client, sample_data):
+    """Test sorting books by different fields."""
+    # Sort by price ascending
+    response = client.get('/api/books?sort_by=price&sort_order=asc')
+    assert response.status_code == 200
+
+    data = json.loads(response.data)
+    prices = [float(book['price']) for book in data['books']]
+    assert prices == sorted(prices)
 
 
 def test_get_book_by_id(client, sample_data):
@@ -67,6 +141,14 @@ def test_create_book(client, sample_data):
     get_response = client.get(f'/api/books/{book_id}')
     assert get_response.status_code == 200
 
+
+def test_create_book_invalid_content_type(client):
+    """Test creating a book with invalid content type."""
+    response = client.post('/api/books', data='invalid data')
+    assert response.status_code == 415
+    data = json.loads(response.data)
+    assert 'error' in data
+    assert data['error'] == errors.INVALID_CONTENT_TYPE
 
 def test_create_book_invalid_data(client):
     """Test creating a book with invalid data"""
@@ -147,14 +229,45 @@ def test_create_book_invalid_publisher(client, sample_data):
     assert data['error'] == errors.PUBLISHER_NOT_FOUND
 
 
+# Feature not implemented yet
+def test_create_book_duplicate_isbn(client, sample_data):
+    """Test creating a book with a duplicate ISBN."""
+    book_id = sample_data['books'][1]
+
+    # Use an existing ISBN from another book
+    existing_isbn = client.get(f'/api/books/{book_id}').json['isbn']
+    duplicate_isbn_book = {
+        'title': 'Duplicate ISBN Book',
+        'isbn': existing_isbn,
+        'price': 12.99,
+        'author_id': sample_data['authors'][0],
+        'publisher_id': sample_data['publishers'][0]
+    }
+
+    response = client.post(
+        '/api/books',
+        json=duplicate_isbn_book
+    )
+
+    assert response.status_code == 409
+    data = json.loads(response.data)
+    assert 'error' in data
+    assert data['error'] == errors.DUPLICATE_ISBN
+
 def test_update_book(client, sample_data):
     """Test updating a book"""
     book_id = sample_data['books'][0]
+
     updated_data = {
         "title": "Updated Book Title",
         "price": 29.99,
+        "isbn": "1234567890123",
+        'publication_date': "2023-10-01",
         "stock": 15,
-        "description": "Updated description"
+        "description": "Updated description",
+        "publisher_id": sample_data['publishers'][0],
+        "author_id": sample_data['authors'][0],
+        "category_ids": [sample_data['categories'][0][0]]  # Valid category ID
     }
     response = client.put(f'/api/books/{book_id}', json=updated_data)
 
@@ -167,7 +280,49 @@ def test_update_book(client, sample_data):
     assert data['description'] == "Updated description"
 
 
-def test_update_nonexistent_book(client):
+def test_update_book_invalid_date(client, sample_data):
+    """Test updating a book with an invalid date.
+
+    Args:
+        client: The test client for making requests to the API.
+        sample_data: Sample data for testing.
+    """
+    book_id = sample_data['books'][0]
+
+    # Invalid date format
+    update_data = {
+        "publication_date": "invalid-date-format",
+    }
+
+    response = client.put(f'/api/books/{book_id}', json=update_data)
+
+    assert response.status_code == 400
+
+    data = json.loads(response.data)
+    assert 'error' in data
+    assert data['error'] == errors.INVALID_DATE_FORMAT
+
+
+def test_update_book_duplicate_isbn(client, sample_data):
+    """Test updating a book with a duplicate ISBN."""
+    book_id = sample_data['books'][0]
+    second_book_id = sample_data['books'][1]
+
+    # Use an existing ISBN from another book
+    existing_isbn = client.get(f'/api/books/{second_book_id}').json['isbn']
+    print(existing_isbn)
+    update_data = {
+        "isbn": existing_isbn,
+    }
+    
+    response = client.put(f'/api/books/{book_id}', json=update_data)
+
+    assert response.status_code == 409  # ++ 409 but 400 for now, TO BE FIXED
+    data = json.loads(response.data)
+    assert data['error'] == errors.DUPLICATE_ISBN
+                        
+
+def test_update_book_not_found(client):
     """Test updating a book that doesn't exist."""
     update_data = {'title': 'This Book Does Not Exist'}
 
@@ -248,44 +403,3 @@ def test_delete_nonexistent_book(client):
 
     assert data['error'] == errors.BOOK_NOT_FOUND
 
-
-def test_filter_books_by_title(client, sample_data):
-    """Test filtering books by title."""
-    response = client.get('/api/books?title=test')
-    assert response.status_code == 200
-
-    data = json.loads(response.data)
-    assert len(data['books']) == 1
-    assert data['books'][0]['title'] == 'Test Book'
-
-
-def test_filter_books_by_author(client, sample_data):
-    """Test filtering books by author name."""
-    response = client.get('/api/books?author_name=John')
-    assert response.status_code == 200
-
-    data = json.loads(response.data)
-    assert len(data['books']) == 1
-    assert data['books'][0]['title'] == 'Test Book'
-
-
-def test_filter_books_by_category(client, sample_data):
-    """Test filtering books by category ID."""
-    category = sample_data['categories'][2][1]  # Science Fiction
-    response = client.get(f'/api/books?category={category}')
-    assert response.status_code == 200
-
-    data = json.loads(response.data)
-    assert len(data['books']) == 1
-    assert data['books'][0]['title'] == 'Another Book'
-
-
-def test_sorting_books(client, sample_data):
-    """Test sorting books by different fields."""
-    # Sort by price ascending
-    response = client.get('/api/books?sort_by=price&sort_order=asc')
-    assert response.status_code == 200
-
-    data = json.loads(response.data)
-    prices = [float(book['price']) for book in data['books']]
-    assert prices == sorted(prices)
