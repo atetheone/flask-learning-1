@@ -42,13 +42,13 @@ def get_authors():
 @authors_bp.route('', methods=['POST'])
 def create_author():
     """Create a new author"""
-    if not request.is_json():
+    if not request.is_json:
         return jsonify({
             "error": "Invalid content type, expected JSON"
-        }, 415)
+        }), 415
 
     data = request.get_json()
-    
+
     # Validate required fields
     if not data.get('first_name') or not data.get('last_name'):
         return jsonify({'error': 'First and last name are required'}), 400
@@ -69,13 +69,20 @@ def create_author():
 @authors_bp.route('/<int:author_id>', methods=['GET'])
 def get_author(author_id):
     """Get a specific author by ID"""
-    author = Author.query.get_or_404(author_id)
+    author = db.session.get(Author, author_id)
+    if not author:
+        return jsonify({'error': 'Author not found'}), 404
+    # author = Author.query.get_or_404(author_id)
+
     return jsonify(author_schema.dump(author))
 
 
 @authors_bp.route('/<int:author_id>/books', methods=['GET'])
 def get_author_books(author_id):
     """Get all books by a specific author"""
-    author = Author.query.get_or_404(author_id)
+    author = db.session.get(Author, author_id)
+    if not author:
+        return jsonify({'error': 'Author not found'}), 404
+    # author = Author.query.get_or_404(author_id)
     books = author.books.all()
     return jsonify(books_schema.dump(books))
