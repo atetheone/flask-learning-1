@@ -93,14 +93,14 @@ def get_book(book_id: int):
 def create_book():
     """Create a new book"""
     if not request.is_json:
-        return jsonify({"error": "Invalid content type"}), 415
+        return jsonify({"error": errors.INVALID_CONTENT_TYPE}), 415
     data = request.get_json()
 
     # Validate input
     required_fields = ['title', 'isbn', 'price', 'author_id', 'publisher_id']
     for field in required_fields:
         if field not in data:
-            return jsonify({'error': f'Missing required field: {field}'}), 400
+            return jsonify({'error': errors.MISSING_REQUIRED_FIELD.format(field=field)}), 400
 
     # Verify author and publisher exist
     author = db.session.get(Author, data['author_id'])
@@ -115,6 +115,13 @@ def create_book():
             'error': errors.PUBLISHER_NOT_FOUND
         }), 404
 
+    # Check for duplicate ISBN
+    existing_book = db.session.query(Book).filter_by(isbn=data['isbn']).first()
+    if existing_book:
+        return jsonify({
+            'error': errors.DUPLICATE_ISBN
+        }), 409
+    
     # Create new book
     book = Book(
         title=data['title'],
@@ -154,9 +161,20 @@ def update_book(book_id: int):
     if 'title' in data:
         book.title = data['title']
     if 'isbn' in data:
+        # check for duplicate ISBN
+        existing_book = Book.query.filter_by(isbn=data['isbn']).first()
+        if existing_book and existing_book.book_id != book_id:
+            return jsonify({
+                'error': errors.DUPLICATE_ISBN
+            }), 409
         book.isbn = data['isbn']
     if 'publication_date' in data:
-        book.publication_date = data['publication_date']
+        try:
+            book.publication_date = parse_date(data['publication_date'])
+        except ValueError:
+            return jsonify({
+                'error': errors.INVALID_DATE_FORMAT
+            }), 400
     if 'price' in data:
         book.price = data['price']
     if 'stock' in data:
@@ -206,3 +224,12 @@ def delete_book(book_id: int):
     db.session.commit()
 
     return '', 204
+
+
+def parse_date(date_str: str):
+    """Parse a date string into a datetime object"""
+    from datetime import datetime
+    try:
+        return datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        raise ValueError(errors.INVALID_DATE_FORMAT)
