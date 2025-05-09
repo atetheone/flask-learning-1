@@ -1,0 +1,42 @@
+name: Bookstore API CI
+
+on:
+    push:
+        branches: [project1-bookstore]
+    pull_request:
+        branches: [project1-bookstore]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+
+            - name: Set up Python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: '3.13'
+
+            - name: Install dependencies
+              run: |
+                python3 -m pip install --upgrade pip
+                pip install -r requirements.txt
+
+            - name: Check code formatting
+              run: |
+                black --check -l 90 -C -S src
+                flake8 src --max-line-length 90
+            
+            - name: Check unused dependencies with flake8
+              run: |
+                flake8 app/ --select=F401
+                flake8 tests/ --select=F401
+            - name: Check for security vulnerabilities
+              run: |
+                bandit -r app --severity-level low
+                pip-audit
+            - name: Run tests
+              run: |
+                python3 -m pytest --cov=src --cov-fail-under=80 --cov-report html tests/
+                
