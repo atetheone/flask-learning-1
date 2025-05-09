@@ -394,61 +394,61 @@ def test_update_book_invalid_categry_ids_type(client, sample_data):
     assert data["error"] == errors.INVALID_CONTENT_TYPE
 
 
-# def test_update_book_with_empty_category_ids_list(client, sample_data):
-#     """Test updating a book with an empty category_ids list."""
-#     book_id = sample_data["books"][0]
+def test_update_book_with_empty_category_ids_list(client, sample_data):
+    """Test updating a book with an empty category_ids list."""
+    book_id = sample_data["books"][0]
 
-#     # Get original book data to verify changes
-#     original_book = client.get(f"/api/books/{book_id}").json
+    # Get original book data to verify changes
+    # original_book = client.get(f"/api/books/{book_id}").json
 
-#     # Update with empty category_ids list
-#     update_data = {"category_ids": []}
-#     response = client.put(f"/api/books/{book_id}", json=update_data)
+    # Update with empty category_ids list
+    update_data = {"category_ids": []}
+    response = client.put(f"/api/books/{book_id}", json=update_data)
 
-#     print(response.data)
-#     assert response.status_code == 200
-#     updated_book = json.loads(response.data)
+    print(response.data)
+    assert response.status_code == 200
+    updated_book = json.loads(response.data)
 
-#     # Verify that categories were cleared
-#     assert len(updated_book["categories"]) == 0
-
-
-# def test_update_book_with_valid_category_ids(client, sample_data):
-#     """Test updating a book with valid category IDs."""
-#     book_id = sample_data["books"][0]
-#     category_id = sample_data["categories"][0][0]  # First category ID
-
-#     # Update with specific category
-#     update_data = {"category_ids": [category_id]}
-#     response = client.put(f"/api/books/{book_id}", json=update_data)
-
-#     assert response.status_code == 200
-#     updated_book = json.loads(response.data)
-
-#     # Verify that categories were updated
-#     assert len(updated_book["categories"]) == 1
-#     assert updated_book["categories"][0]["category_id"] == category_id
+    # Verify that categories were cleared
+    assert len(updated_book["categories"]) == 0
 
 
-# def test_update_book_with_multiple_category_ids(client, sample_data):
-#     """Test updating a book with multiple category IDs."""
-#     book_id = sample_data["books"][0]
-#     category_ids = [
-#         sample_data["categories"][0][0],  # First category
-#         sample_data["categories"][1][0]   # Second category
-#     ]
+def test_update_book_with_valid_category_ids(client, sample_data):
+    """Test updating a book with valid category IDs."""
+    book_id = sample_data["books"][0]
+    category_id = sample_data["categories"][0][0]  # First category ID
 
-#     # Update with multiple categories
-#     update_data = {"category_ids": category_ids}
-#     response = client.put(f"/api/books/{book_id}", json=update_data)
+    # Update with specific category
+    update_data = {"category_ids": [category_id]}
+    response = client.put(f"/api/books/{book_id}", json=update_data)
 
-#     assert response.status_code == 200
-#     updated_book = json.loads(response.data)
+    assert response.status_code == 200
+    updated_book = json.loads(response.data)
 
-#     # Verify that categories were updated
-#     assert len(updated_book["categories"]) == 2
-#     retrieved_category_ids = [cat["category_id"] for cat in updated_book["categories"]]
-#     assert set(retrieved_category_ids) == set(category_ids)
+    # Verify that categories were updated
+    assert len(updated_book["categories"]) == 1
+    assert updated_book["categories"][0]["category_id"] == category_id
+
+
+def test_update_book_with_multiple_category_ids(client, sample_data):
+    """Test updating a book with multiple category IDs."""
+    book_id = sample_data["books"][0]
+    category_ids = [
+        sample_data["categories"][0][0],  # First category
+        sample_data["categories"][1][0]   # Second category
+    ]
+
+    # Update with multiple categories
+    update_data = {"category_ids": category_ids}
+    response = client.put(f"/api/books/{book_id}", json=update_data)
+
+    assert response.status_code == 200
+    updated_book = json.loads(response.data)
+
+    # Verify that categories were updated
+    assert len(updated_book["categories"]) == 2
+    retrieved_category_ids = [cat["category_id"] for cat in updated_book["categories"]]
+    assert set(retrieved_category_ids) == set(category_ids)
 
 
 def test_update_book_category_ids_string_value(client, sample_data):

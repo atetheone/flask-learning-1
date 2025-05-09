@@ -6,6 +6,7 @@ and deserializing Publisher objects.
 
 from app import ma
 from app.models import Publisher
+from app.schemas.nested import NestedBookSchema
 
 
 class PublisherSchema(ma.SQLAlchemySchema):
@@ -19,7 +20,6 @@ class PublisherSchema(ma.SQLAlchemySchema):
         """
 
         model = Publisher
-        include_fk = True
 
     publisher_id = ma.auto_field()
     name = ma.auto_field()
@@ -28,15 +28,17 @@ class PublisherSchema(ma.SQLAlchemySchema):
     created_at = ma.auto_field()
     updated_at = ma.auto_field()
 
+    # Add the books field using the nested schema
+    books = ma.Nested(NestedBookSchema, many=True)
+
     _links = ma.Hyperlinks(
         {
             "self": ma.URLFor(
-                "publishers.get_publisher",
-                values=dict(publisher_id="<publisher_id>")
+                "publishers.get_publisher", values=dict(publisher_id="<publisher_id>")
             ),
             "books": ma.URLFor(
                 "publishers.get_publisher_books",
-                values=dict(publisher_id="<publisher_id>")
+                values=dict(publisher_id="<publisher_id>"),
             ),
         }
     )

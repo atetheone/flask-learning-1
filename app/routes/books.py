@@ -5,7 +5,7 @@ This module defines the routes for managing books in the application.
 from flask import Blueprint, jsonify, request
 from app import db
 from app.models import Book, Author, Category, Publisher
-from app.schemas import books_schema, book_schema
+from app.schemas import books_schema, book_details_schema
 from app.constants import errors
 from app.utils import parse_date
 
@@ -83,7 +83,7 @@ def get_book(book_id: int):
     book = db.session.get(Book, book_id)
     if book is None:
         return jsonify({"error": errors.BOOK_NOT_FOUND}), 404
-    return jsonify(book_schema.dump(book))
+    return jsonify(book_details_schema.dump(book))
 
 
 @books_bp.route("", methods=["POST"])
@@ -138,7 +138,7 @@ def create_book():
     db.session.add(book)
     db.session.commit()
 
-    return jsonify(book_schema.dump(book)), 201
+    return jsonify(book_details_schema.dump(book)), 201
 
 
 @books_bp.route("/<int:book_id>", methods=["PUT"])
@@ -199,7 +199,7 @@ def update_book(book_id: int):
             book.categories.append(category)
 
     db.session.commit()
-    return jsonify(book_schema.dump(book))
+    return jsonify(book_details_schema.dump(book))
 
 
 @books_bp.route("/<int:book_id>", methods=["DELETE"])

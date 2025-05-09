@@ -3,7 +3,6 @@ from app.models import Publisher, Book
 from flask import Blueprint, request, jsonify
 from app import db
 from app.constants import errors
-from app.utils import parse_date
 
 publishers_bp = Blueprint("publishers", __name__)
 
@@ -58,9 +57,7 @@ def get_publisher_books(publisher_id: int):
     books_query = db.session.query(Book).filter(Book.publisher_id == publisher_id)
 
     # Apply pagination
-    pagination = books_query.order_by(Book.title).paginate(
-        page=page, per_page=per_page
-    )
+    pagination = books_query.order_by(Book.title).paginate(page=page, per_page=per_page)
 
     return jsonify(
         {

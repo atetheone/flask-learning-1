@@ -8,6 +8,7 @@ validation.
 from app.models import Author
 from app import ma
 from marshmallow import fields
+from app.schemas import NestedBookSchema
 
 
 class AuthorSchema(ma.SQLAlchemySchema):
@@ -22,8 +23,6 @@ class AuthorSchema(ma.SQLAlchemySchema):
         """
 
         model = Author
-        include_relashionships = True
-        load_instance = True
 
     author_id = ma.auto_field()
     first_name = ma.auto_field()
@@ -38,8 +37,8 @@ class AuthorSchema(ma.SQLAlchemySchema):
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
 
-    # Exclude books from the basic schema
-    books = ma.Nested("BookSchema", exclude=("author",), many=True)
+    # Add the books field using the nested schema
+    books = ma.Nested(NestedBookSchema, many=True)
 
     # Add url for nested resource
     _links = ma.Hyperlinks(

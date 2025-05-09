@@ -1,6 +1,12 @@
 """
 This module imports all the schemas used in the application."""
 
+from app.schemas.nested import (
+    NestedAuthorSchema,
+    NestedBookSchema,
+    NestedCategorySchema,
+    NestedPublisherSchema,
+)
 from app.schemas.author import AuthorSchema
 from app.schemas.book import BookSchema, BookDetailsSchema
 from app.schemas.publisher import PublisherSchema
@@ -18,3 +24,10 @@ categories_schema = CategorySchema(many=True)
 
 publisher_schema = PublisherSchema()
 publishers_schema = PublisherSchema(many=True)
+
+_, _, _, _ = (
+    NestedAuthorSchema,
+    NestedBookSchema,
+    NestedCategorySchema,
+    NestedPublisherSchema,
+)

@@ -4,9 +4,7 @@ Book schema for serialization and deserialization using Marshmallow.
 
 from app import ma
 from app.models import Book
-from app.schemas.author import AuthorSchema
-from app.schemas.category import CategorySchema
-from app.schemas.publisher import PublisherSchema
+from app.schemas import NestedAuthorSchema, NestedCategorySchema, NestedPublisherSchema
 
 
 class BookSchema(ma.SQLAlchemySchema):
@@ -20,8 +18,6 @@ class BookSchema(ma.SQLAlchemySchema):
         """
 
         model = Book
-        include_fk = True
-        load_instance = True
 
     book_id = ma.auto_field()
     title = ma.auto_field()
@@ -32,10 +28,8 @@ class BookSchema(ma.SQLAlchemySchema):
     description = ma.auto_field()
     created_at = ma.auto_field()
     updated_at = ma.auto_field()
-
-    # Use string references to avoid circular imports
-    author = ma.Nested("AuthorSchema", exclude=("books",))
-    publisher = ma.Nested("PublisherSchema", exclude=("books",))
+    author_id = ma.auto_field()
+    publisher_id = ma.auto_field()
 
     # Only include author and publisher IDs in the basic schema
     _links = ma.Hyperlinks(
@@ -45,8 +39,7 @@ class BookSchema(ma.SQLAlchemySchema):
                 "authors.get_author", values=dict(author_id="<author_id>")
             ),
             "publisher": ma.URLFor(
-                "publishers.get_publisher",
-                values=dict(publisher_id="<publisher_id>")
+                "publishers.get_publisher", values=dict(publisher_id="<publisher_id>")
             ),
             # publishers routes are not implemented yet
         }
@@ -60,10 +53,6 @@ class BookDetailsSchema(BookSchema):
     including nested author, publisher, and categories.
     """
 
-    author = ma.Nested(AuthorSchema, exclude=("books", "biography"))
-    publisher = ma.Nested(PublisherSchema, exclude=("books", "created_at", "updated_at"))
-    categories = ma.Nested(
-        CategorySchema,
-        many=True,
-        exclude=("books", "description", "created_at", "updated_at"),
-    )
+    author = ma.Nested(NestedAuthorSchema)
+    publisher = ma.Nested(NestedPublisherSchema)
+    categories = ma.Nested(NestedCategorySchema, many=True)
