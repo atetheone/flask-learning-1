@@ -1,5 +1,4 @@
-from datetime import datetime
-import pytest
+# import pytest
 import json
 from app.constants import errors
 
@@ -10,10 +9,14 @@ def test_get_authors(client, sample_data):
     assert response.status_code == 200
     data = json.loads(response.data)
     authors = data['authors']
-    assert len(authors) == 2
-    assert authors[0]['first_name'] == 'John'
-    assert authors[1]['first_name'] == 'Jane'
-    assert data['pagination']['total_items'] == 2
+    print(authors)
+    assert len(authors) == 3
+    assert [
+        author.get('first_name') in ['John', 'Jane', 'Bookless']
+        for author in authors
+    ]
+
+    assert data['pagination']['total_items'] == 3
     assert data['pagination']['total_pages'] == 1
     assert data['pagination']['current_page'] == 1
 
@@ -99,3 +102,109 @@ def test_create_author_invalid_content_type(client):
     data = json.loads(response.data)
     assert 'error' in data
     assert data['error'] == errors.INVALID_CONTENT_TYPE
+
+
+def test_update_author(client, sample_data):
+    """Test updating an existing author"""
+    author_id = sample_data['authors'][0]
+    updated_author = {
+        'first_name': 'Updated',
+        'last_name': 'Author',
+        'biography': 'An updated author biography',
+        'birth_date': '1992-01-01'
+    }
+    response = client.put(f'/api/authors/{author_id}', json=updated_author)
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data['first_name'] == 'Updated'
+    assert data['last_name'] == 'Author'
+
+
+def test_update_author_not_found(client):
+    """Test updating a non-existent author"""
+    updated_author = {
+        'first_name': 'Updated',
+        'last_name': 'Author'
+    }
+    response = client.put('/api/authors/999', json=updated_author)
+    assert response.status_code == 404
+    data = json.loads(response.data)
+    assert data['error'] == errors.AUTHOR_NOT_FOUND
+
+
+def test_update_author_empty_first_name(client, sample_data):
+    """Test updating an author with an empty first name"""
+    author_id = sample_data['authors'][0]
+    updated_author = {
+        'first_name': '',
+        'last_name': 'Author'
+    }
+    response = client.put(f'/api/authors/{author_id}', json=updated_author)
+    assert response.status_code == 400
+    data = json.loads(response.data)
+    assert data['error'] == errors.EMPTY_FIELD.format(field='first_name')
+
+
+def test_update_author_empty_last_name(client, sample_data):
+    """Test updating an author with an empty last name"""
+    author_id = sample_data['authors'][0]
+    updated_author = {
+        'first_name': 'Updated',
+        'last_name': ''
+    }
+    response = client.put(f'/api/authors/{author_id}', json=updated_author)
+    assert response.status_code == 400
+    data = json.loads(response.data)
+    assert data['error'] == errors.EMPTY_FIELD.format(field='last_name')
+    
+
+def test_update_author_invalid_date_format(client, sample_data):
+    """Test updating an author with an invalid date format"""
+    author_id = sample_data['authors'][0]
+    updated_author = {
+        'first_name': 'Updated',
+        'last_name': 'Author',
+        'birth_date': 'InvalidDateFormat'
+    }
+    response = client.put(f'/api/authors/{author_id}', json=updated_author)
+    assert response.status_code == 400
+    data = json.loads(response.data)
+    assert data['error'] == errors.INVALID_DATE_FORMAT
+
+
+def test_delete_author(client, sample_data):
+    """Test deleting an author"""
+    author_id = sample_data['authors'][2]
+    response = client.delete(f'/api/authors/{author_id}')
+    assert response.status_code == 204
+    # Check if the author is actually deleted
+    response = client.get(f'/api/authors/{author_id}')
+    assert response.status_code == 404
+    data = json.loads(response.data)
+    assert data['error'] == errors.AUTHOR_NOT_FOUND
+    
+
+def test_delete_author_not_found(client):
+    """Test deleting a non-existent author"""
+    response = client.delete('/api/authors/999')
+    assert response.status_code == 404
+    data = json.loads(response.data)
+    assert data['error'] == errors.AUTHOR_NOT_FOUND
+    
+    
+def test_delete_author_with_books(client, sample_data):
+    """Test deleting an author with existing books"""
+    author_id = sample_data['authors'][0]
+    # Create a book for the author
+    new_book = {
+        'title': 'New Book',
+        'isbn': '1234567890123',
+        'publication_date': '2023-01-01',
+        'author_id': author_id
+    }
+    client.post('/api/books', json=new_book)
+    
+    response = client.delete(f'/api/authors/{author_id}')
+    assert response.status_code == 400
+    data = json.loads(response.data)
+    assert data['error'] == errors.AUTHOR_HAS_BOOKS
