@@ -103,18 +103,14 @@ def update_author(author_id: int):
     if "first_name" in data:
         if not data["first_name"]:
             return (
-                jsonify({
-                    "error": errors.EMPTY_FIELD.format(field="first_name")
-                }),
+                jsonify({"error": errors.EMPTY_FIELD.format(field="first_name")}),
                 400,
             )
         author.first_name = data["first_name"]
 
     if "last_name" in data:
         if not data["last_name"]:
-            return jsonify({
-                "error": errors.EMPTY_FIELD.format(field="last_name")
-            }), 400
+            return jsonify({"error": errors.EMPTY_FIELD.format(field="last_name")}), 400
         author.last_name = data["last_name"]
 
     if "birth_date" in data:

@@ -17,6 +17,7 @@ class PublisherSchema(ma.SQLAlchemySchema):
         """
         Meta class for PublisherSchema.
         """
+
         model = Publisher
 
     publisher_id = ma.auto_field()
@@ -28,11 +29,7 @@ class PublisherSchema(ma.SQLAlchemySchema):
 
     _links = ma.Hyperlinks(
         {
-            "self": ma.URLFor(
-                "publishers.get_publisher", values=dict(id="<id>")
-            ),
-            "books": ma.URLFor(
-                "publishers.get_publisher_books", values=dict(id="<id>")
-            ),
+            "self": ma.URLFor("publishers.get_publisher", values=dict(id="<id>")),
+            "books": ma.URLFor("publishers.get_publisher_books", values=dict(id="<id>")),
         }
     )

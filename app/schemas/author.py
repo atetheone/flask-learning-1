@@ -14,11 +14,13 @@ class AuthorSchema(ma.SQLAlchemySchema):
     """
     Schema for serializing and deserializing Author objects.
     """
+
     class Meta:
         """
         Meta class for AuthorSchema.
         Defines the model associated with this schema.
         """
+
         model = Author
 
     author_id = ma.auto_field()
@@ -37,13 +39,9 @@ class AuthorSchema(ma.SQLAlchemySchema):
     # Add url for nested resource
     _links = ma.Hyperlinks(
         {
-            "self": ma.URLFor(
-                "authors.get_author",
-                values=dict(author_id="<author_id>")
-            ),
+            "self": ma.URLFor("authors.get_author", values=dict(author_id="<author_id>")),
             "books": ma.URLFor(
-                "authors.get_author_books",
-                values=dict(author_id="<author_id>")
+                "authors.get_author_books", values=dict(author_id="<author_id>")
             ),
         }
     )

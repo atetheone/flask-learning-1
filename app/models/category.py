@@ -4,12 +4,7 @@ from app import db
 # Assoc table many-to-many books and categories
 book_categories = db.Table(
     "book_categories",
-    db.Column(
-        "book_id",
-        db.Integer,
-        db.ForeignKey("books.book_id"),
-        primary_key=True,
-    ),
+    db.Column("book_id", db.Integer, db.ForeignKey("books.book_id"), primary_key=True),
     db.Column(
         "category_id",
         db.Integer,
@@ -40,9 +35,7 @@ class Category(db.Model):
     name = db.Column(db.String(50), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     created_at = db.Column(
-        db.DateTime,
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
+        db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
     )
     updated_at = db.Column(
         db.DateTime,

@@ -23,10 +23,7 @@ class Author(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     birth_date = db.Column(db.Date, nullable=True)
     biography = db.Column(db.Text, nullable=True)
-    created_at = db.Column(
-        db.DateTime,
-        default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc),

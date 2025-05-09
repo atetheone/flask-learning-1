@@ -55,9 +55,7 @@ def get_category_books(category_id: int):
     # Paginate books in the category
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    books_query = db.session.query(Book).filter(
-        Category.category_id == category_id
-    )
+    books_query = db.session.query(Book).filter(Category.category_id == category_id)
 
     # Apply pagination
     pagination = books_query.paginate(page=page, per_page=per_page)
@@ -84,25 +82,16 @@ def create_category():
     # Validate required fields
     if not data.get("name"):
         return (
-            jsonify({
-                "error": errors.MISSING_REQUIRED_FIELD.format(field="name")
-            }),
+            jsonify({"error": errors.MISSING_REQUIRED_FIELD.format(field="name")}),
             400,
         )
 
     # Check if category already exists
-    existing_category = (
-        db.session.query(Category)
-        .filter_by(name=data["name"])
-        .first()
-    )
+    existing_category = db.session.query(Category).filter_by(name=data["name"]).first()
     if existing_category:
         return jsonify({"error": errors.DUPLICATE_CATEGORY}), 400
 
-    category = Category(
-        name=data["name"],
-        description=data.get("description"),
-    )
+    category = Category(name=data["name"], description=data.get("description"))
 
     db.session.add(category)
     db.session.commit()
@@ -123,11 +112,7 @@ def update_category(category_id: int):
         return jsonify({"error": errors.EMPTY_FIELD.format(field="name")}), 400
 
     # Check if category already exists
-    existing_category = (
-        db.session.query(Category)
-        .filter_by(name=data["name"])
-        .first()
-    )
+    existing_category = db.session.query(Category).filter_by(name=data["name"]).first()
     if existing_category and existing_category.category_id != category_id:
         return jsonify({"error": errors.DUPLICATE_CATEGORY}), 400
 

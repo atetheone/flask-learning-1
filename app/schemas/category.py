@@ -12,11 +12,13 @@ class CategorySchema(ma.SQLAlchemySchema):
     """
     Schema for the Category model, defining fields and hyperlinks.
     """
+
     class Meta:
         """
         Meta class for CategorySchema to define model
         and additional configurations.
         """
+
         model = Category
 
     category_id = ma.auto_field()
@@ -25,9 +27,14 @@ class CategorySchema(ma.SQLAlchemySchema):
     created_at = ma.auto_field()
     updated_at = ma.auto_field()
 
-    _links = ma.Hyperlinks({
-        "self": ma.URLFor("categories.get_category", values=dict(category_id="<category_id>")),
-        # "books": ma.URLFor(
-        #     "categories.get_category_books", values=dict(category_id="<category_id>")
-        # )
-    })
+    _links = ma.Hyperlinks(
+        {
+            "self": ma.URLFor(
+                "categories.get_category", values=dict(category_id="<category_id>")
+            ),
+            # "books": ma.URLFor(
+            #     "categories.get_category_books",
+            #     values=dict(category_id="<category_id>")
+            # )
+        }
+    )

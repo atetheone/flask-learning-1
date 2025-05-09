@@ -9,9 +9,7 @@ class Publisher(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
     website = db.Column(db.String(200), nullable=True)
     address = db.Column(db.String(200), nullable=True)
-    updated_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     created_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc),

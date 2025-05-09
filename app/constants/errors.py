@@ -22,9 +22,6 @@ ERROR_UNAUTHORIZED_ACCESS = (
     "Unauthorized access. You do not have the"
     "necessary permissions to perform this action."
 )
-ERROR_INVALID_INPUT = (
-    "Invalid input provided."
-    "Please check the data and try again."
-)
+ERROR_INVALID_INPUT = "Invalid input provided." "Please check the data and try again."
 ERROR_TIMEOUT = "The operation timed out. Please try again later."
 ERROR_UNKNOWN = "An unknown error has occurred. Please contact support."

@@ -23,6 +23,7 @@ class Book(db.Model):
         author_id (int): The foreign key to the author.
         publisher_id (int): The foreign key to the publisher.
     """
+
     __tablename__ = "books"
 
     book_id = db.Column(db.Integer, primary_key=True)
@@ -32,9 +33,7 @@ class Book(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     stock = db.Column(db.Integer, default=0)
     description = db.Column(db.Text, nullable=True)
-    updated_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     created_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc),
@@ -64,9 +63,7 @@ class Book(db.Model):
     #         "author_id": self.author_id,
     #         "publisher_id": self.publisher_id,
     #     }
-    author_id = db.Column(
-        db.Integer, db.ForeignKey("authors.author_id"), nullable=False
-    )
+    author_id = db.Column(db.Integer, db.ForeignKey("authors.author_id"), nullable=False)
     publisher_id = db.Column(
         db.Integer, db.ForeignKey("publishers.publisher_id"), nullable=False
     )
