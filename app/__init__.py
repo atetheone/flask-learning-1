@@ -47,5 +47,6 @@ def create_app(config_name="default"):
 
     return app
 
+
 # Import models here to avoid circular imports
 from app.models import Author, Book, Publisher, Category
