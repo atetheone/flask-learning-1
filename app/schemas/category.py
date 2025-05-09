@@ -26,8 +26,8 @@ class CategorySchema(ma.SQLAlchemySchema):
     updated_at = ma.auto_field()
 
     _links = ma.Hyperlinks({
-        "self": ma.URLFor("categories.get_category", values=dict(id="<id>")),
-        "books": ma.URLFor(
-            "categories.get_category_books", values=dict(id="<id>")
-        )
+        "self": ma.URLFor("categories.get_category", values=dict(category_id="<category_id>")),
+        # "books": ma.URLFor(
+        #     "categories.get_category_books", values=dict(category_id="<category_id>")
+        # )
     })
