@@ -4,3 +4,4 @@ from app.models.book import Book
 from app.models.category import Category
 from app.models.publisher import Publisher
 
+__all__ = ["Author", "Book", "Category", "Publisher"]
