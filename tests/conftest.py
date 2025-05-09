@@ -1,13 +1,14 @@
 import pytest
 from app import create_app, db
 from app.models import Author, Book, Category, Publisher
+
 # from datetime import date
 
 
 @pytest.fixture
 def app():
     """Create application for the tests."""
-    app = create_app('testing')
+    app = create_app("testing")
 
     # Create tables and context
     with app.app_context():
@@ -36,7 +37,11 @@ def sample_data(app):
         # Create authors
         author1 = Author(first_name="John", last_name="Doe")
         author2 = Author(first_name="Jane", last_name="Does")
-        db.session.add_all([author1, author2])
+        bookless_author = Author(first_name="Bookless", last_name="Author")
+
+        # Add authors to the session
+        db.session.add_all([author1, author2, bookless_author])
+        db.session.commit()
 
         # Create publishers
         publisher1 = Publisher(name="Test Publisher")
@@ -59,7 +64,7 @@ def sample_data(app):
             stock=10,
             author_id=author1.author_id,
             publisher_id=publisher1.publisher_id,
-            description="A test book"
+            description="A test book",
         )
 
         db.session.add(book1)
@@ -73,30 +78,30 @@ def sample_data(app):
             stock=5,
             author_id=author2.author_id,
             publisher_id=publisher2.publisher_id,
-            description="Another test book"
+            description="Another test book",
         )
 
         db.session.add(book2)
         db.session.flush()  # Flush to ensure book2 has an ID
 
         # Now safe to establish relationships
-        book2.categories.extend([fiction, scifi])
+        book2.categories.extend([nonfiction])
 
         # Commit all changes
         db.session.commit()
 
         # Return the IDs for use in tests
         return {
-            'authors': [author1.author_id, author2.author_id],
-            'publishers': [publisher1.publisher_id, publisher2.publisher_id],
-            'categories': [
+            "authors": [
+                author1.author_id,
+                author2.author_id,
+                bookless_author.author_id,
+            ],
+            "publishers": [publisher1.publisher_id, publisher2.publisher_id],
+            "categories": [
                 [fiction.category_id, fiction.name],
                 [nonfiction.category_id, nonfiction.name],
-                [scifi.category_id, scifi.name]
+                [scifi.category_id, scifi.name],
             ],
-            'category_ids': [
-                fiction.category_id,
-                scifi.category_id
-            ],
-            'books': [book1.book_id, book2.book_id]
+            "books": [book1.book_id, book2.book_id],
         }
