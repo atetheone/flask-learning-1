@@ -162,7 +162,6 @@ def test_create_book_invalid_data(client):
         "description": "",
         "publisher_id": 9999,  # Invalid: non-existent publisher
         "author_id": 9999,  # Invalid: non-existent author
-        "category_ids": [9999],  # Invalid: non-existent category
     }
     response = client.post("/api/books", json=invalid_data)
     assert response.status_code == 404  # ++ 400 but 404 for now, TO BE FIXED
@@ -243,6 +242,25 @@ def test_create_book_duplicate_isbn(client, sample_data):
     data = json.loads(response.data)
     assert "error" in data
     assert data["error"] == errors.DUPLICATE_ISBN
+
+
+def test_create_book_invalid_category_id(client, sample_data):
+    """Test creating a book with an invalid category ID."""
+    invalid_category_book = {
+        "title": "Invalid Category Book",
+        "isbn": "978-3-16-148410-0",
+        "price": 12.99,
+        "author_id": sample_data["authors"][0],
+        "publisher_id": sample_data["publishers"][0],
+        "category_ids": [9999],  # Invalid category ID
+    }
+
+    response = client.post("/api/books", json=invalid_category_book)
+
+    assert response.status_code == 404
+    data = json.loads(response.data)
+    assert "error" in data
+    assert data["error"] == errors.CATEGORY_NOT_FOUND
 
 
 def test_update_book(client, sample_data):
@@ -361,6 +379,114 @@ def test_update_book_invalid_category(client, sample_data):
     book_id = sample_data["books"][0]
     update_data = {"category_ids": [9999]}
     response = client.put(f"/api/books/{book_id}", json=update_data)
+    assert response.status_code == 404
+    data = json.loads(response.data)
+    assert data["error"] == errors.CATEGORY_NOT_FOUND
+
+
+def test_update_book_invalid_categry_ids_type(client, sample_data):
+    """Test updating a book with invalid category IDs type."""
+    book_id = sample_data["books"][0]
+    update_data = {"category_ids": "invalid_type"}
+    response = client.put(f"/api/books/{book_id}", json=update_data)
+    assert response.status_code == 415
+    data = json.loads(response.data)
+    assert data["error"] == errors.INVALID_CONTENT_TYPE
+
+
+# def test_update_book_with_empty_category_ids_list(client, sample_data):
+#     """Test updating a book with an empty category_ids list."""
+#     book_id = sample_data["books"][0]
+
+#     # Get original book data to verify changes
+#     original_book = client.get(f"/api/books/{book_id}").json
+
+#     # Update with empty category_ids list
+#     update_data = {"category_ids": []}
+#     response = client.put(f"/api/books/{book_id}", json=update_data)
+
+#     print(response.data)
+#     assert response.status_code == 200
+#     updated_book = json.loads(response.data)
+
+#     # Verify that categories were cleared
+#     assert len(updated_book["categories"]) == 0
+
+
+# def test_update_book_with_valid_category_ids(client, sample_data):
+#     """Test updating a book with valid category IDs."""
+#     book_id = sample_data["books"][0]
+#     category_id = sample_data["categories"][0][0]  # First category ID
+
+#     # Update with specific category
+#     update_data = {"category_ids": [category_id]}
+#     response = client.put(f"/api/books/{book_id}", json=update_data)
+
+#     assert response.status_code == 200
+#     updated_book = json.loads(response.data)
+
+#     # Verify that categories were updated
+#     assert len(updated_book["categories"]) == 1
+#     assert updated_book["categories"][0]["category_id"] == category_id
+
+
+# def test_update_book_with_multiple_category_ids(client, sample_data):
+#     """Test updating a book with multiple category IDs."""
+#     book_id = sample_data["books"][0]
+#     category_ids = [
+#         sample_data["categories"][0][0],  # First category
+#         sample_data["categories"][1][0]   # Second category
+#     ]
+
+#     # Update with multiple categories
+#     update_data = {"category_ids": category_ids}
+#     response = client.put(f"/api/books/{book_id}", json=update_data)
+
+#     assert response.status_code == 200
+#     updated_book = json.loads(response.data)
+
+#     # Verify that categories were updated
+#     assert len(updated_book["categories"]) == 2
+#     retrieved_category_ids = [cat["category_id"] for cat in updated_book["categories"]]
+#     assert set(retrieved_category_ids) == set(category_ids)
+
+
+def test_update_book_category_ids_string_value(client, sample_data):
+    """Test updating a book with category_ids as a string instead of list."""
+    book_id = sample_data["books"][0]
+
+    # Provide a string instead of a list
+    update_data = {"category_ids": "Fiction"}
+    response = client.put(f"/api/books/{book_id}", json=update_data)
+
+    assert response.status_code == 415
+    data = json.loads(response.data)
+    assert data["error"] == errors.INVALID_CONTENT_TYPE
+
+
+def test_update_book_category_ids_integer_value(client, sample_data):
+    """Test updating a book with category_ids as an integer instead of list."""
+    book_id = sample_data["books"][0]
+
+    # Provide an integer instead of a list
+    update_data = {"category_ids": 123}
+    response = client.put(f"/api/books/{book_id}", json=update_data)
+
+    assert response.status_code == 415
+    data = json.loads(response.data)
+    assert data["error"] == errors.INVALID_CONTENT_TYPE
+
+
+def test_update_book_with_mixed_valid_invalid_category_ids(client, sample_data):
+    """Test updating a book with a mix of valid and invalid category IDs."""
+    book_id = sample_data["books"][0]
+    valid_category_id = sample_data["categories"][0][0]
+    invalid_category_id = 9999
+
+    # Update with one valid and one invalid category
+    update_data = {"category_ids": [valid_category_id, invalid_category_id]}
+    response = client.put(f"/api/books/{book_id}", json=update_data)
+
     assert response.status_code == 404
     data = json.loads(response.data)
     assert data["error"] == errors.CATEGORY_NOT_FOUND

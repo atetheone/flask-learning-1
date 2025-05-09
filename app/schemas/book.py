@@ -20,6 +20,8 @@ class BookSchema(ma.SQLAlchemySchema):
         """
 
         model = Book
+        include_fk = True
+        load_instance = True
 
     book_id = ma.auto_field()
     title = ma.auto_field()
@@ -31,6 +33,10 @@ class BookSchema(ma.SQLAlchemySchema):
     created_at = ma.auto_field()
     updated_at = ma.auto_field()
 
+    # Use string references to avoid circular imports
+    author = ma.Nested("AuthorSchema", exclude=("books",))
+    publisher = ma.Nested("PublisherSchema", exclude=("books",))
+
     # Only include author and publisher IDs in the basic schema
     _links = ma.Hyperlinks(
         {
@@ -38,10 +44,10 @@ class BookSchema(ma.SQLAlchemySchema):
             "author": ma.URLFor(
                 "authors.get_author", values=dict(author_id="<author_id>")
             ),
-            # "publisher": ma.URLFor(
-            #     "publishers.get_publisher",
-            #     values=dict(publisher_id="<publisher_id>")
-            # ),
+            "publisher": ma.URLFor(
+                "publishers.get_publisher",
+                values=dict(publisher_id="<publisher_id>")
+            ),
             # publishers routes are not implemented yet
         }
     )

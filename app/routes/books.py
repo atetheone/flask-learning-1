@@ -7,7 +7,7 @@ from app import db
 from app.models import Book, Author, Category, Publisher
 from app.schemas import books_schema, book_schema
 from app.constants import errors
-from app.utils.parse_date import parse_date
+from app.utils import parse_date
 
 books_bp = Blueprint("books", __name__)
 
@@ -132,6 +132,8 @@ def create_book():
             category = db.session.get(Category, category_id)
             if category:
                 book.categories.append(category)
+            else:
+                return jsonify({"error": errors.CATEGORY_NOT_FOUND}), 404
 
     db.session.add(book)
     db.session.commit()
@@ -185,6 +187,9 @@ def update_book(book_id: int):
         book.publisher_id = data["publisher_id"]
 
     if "category_ids" in data:
+        if not isinstance(data["category_ids"], list):
+            return jsonify({"error": errors.INVALID_CONTENT_TYPE}), 415
+
         # Clear existing categories
         book.categories = []
         for category_id in data["category_ids"]:

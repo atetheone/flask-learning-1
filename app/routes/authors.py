@@ -3,7 +3,7 @@ from app import db
 from app.constants import errors
 from app.models import Author
 from app.schemas import author_schema, authors_schema, books_schema
-from app.utils.parse_date import parse_date
+from app.utils import parse_date
 
 authors_bp = Blueprint("authors", __name__)
 
@@ -47,7 +47,7 @@ def get_authors():
 def create_author():
     """Create a new author"""
     if not request.is_json:
-        return jsonify({"error": "Invalid content type, expected JSON"}), 415
+        return jsonify({"error": errors.INVALID_CONTENT_TYPE}), 415
 
     data = request.get_json()
 

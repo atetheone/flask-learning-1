@@ -20,6 +20,7 @@ class CategorySchema(ma.SQLAlchemySchema):
         """
 
         model = Category
+        include_fk = True
 
     category_id = ma.auto_field()
     name = ma.auto_field()
@@ -27,14 +28,17 @@ class CategorySchema(ma.SQLAlchemySchema):
     created_at = ma.auto_field()
     updated_at = ma.auto_field()
 
+    # Exclude books from the basic schema
+    # books = ma.Nested("BookSchema", exclude=("categories",), many=True)
+
     _links = ma.Hyperlinks(
         {
             "self": ma.URLFor(
                 "categories.get_category", values=dict(category_id="<category_id>")
             ),
-            # "books": ma.URLFor(
-            #     "categories.get_category_books",
-            #     values=dict(category_id="<category_id>")
-            # )
+            "books": ma.URLFor(
+                "categories.get_category_books",
+                values=dict(category_id="<category_id>")
+            )
         }
     )
