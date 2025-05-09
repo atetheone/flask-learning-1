@@ -92,8 +92,7 @@ def seed_db():
         Category(
             name="Dystopian",
             description=(
-                "Books set in an imagined society characterized by "
-                "suffering"
+                "Books set in an imagined society characterized by " "suffering"
             ),
         ),
     ]
@@ -151,16 +150,16 @@ def seed_db():
 
 
 @app.cli.command("reset-db")
-@click.confirmation_option(prompt='Are you sure you want to reset the database?')
+@click.confirmation_option(prompt="Are you sure you want to reset the database?")
 def reset_db():
     """Drop all tables, recreate them, and seed with sample data."""
     db.drop_all()
-    click.echo('Database tables dropped.')
+    click.echo("Database tables dropped.")
     db.create_all()
-    click.echo('Database tables created.')
+    click.echo("Database tables created.")
 
     # Call the seed function directly
-    ctx = app.cli.get_command('seed-db').callback
+    ctx = app.cli.get_command("seed-db").callback
     ctx()
 
 
