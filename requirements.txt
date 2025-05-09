@@ -7,3 +7,7 @@ python-dotenv
 pytest
 coverage
 pytest-cov
+bandit
+flake8
+black
+pip-audit
