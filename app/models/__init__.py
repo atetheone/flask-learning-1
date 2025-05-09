@@ -4,7 +4,3 @@ from app.models.book import Book
 from app.models.category import Category
 from app.models.publisher import Publisher
 
-Author = Author
-Book = Book
-Category = Category
-Publisher = Publisher
