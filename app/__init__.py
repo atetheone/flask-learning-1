@@ -6,7 +6,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from config import config
-from app.models import Author, Book, Publisher, Category
+
+# from app.models import Author, Book, Publisher, Category
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -33,6 +34,9 @@ def create_app(config_name="default"):
     # Register blueprints
     from app.routes import register_routes
 
+    # Import models here to avoid circular imports
+    from app.models import Author, Book, Publisher, Category
+
     register_routes(app)
 
     # Shell context processor
@@ -48,7 +52,3 @@ def create_app(config_name="default"):
         )
 
     return app
-
-
-# Import models here to avoid circular imports
-# from app.models import Author, Book, Publisher, Category
