@@ -7,6 +7,7 @@ from app import db
 from app.models import Book, Author, Category, Publisher
 from app.schemas import books_schema, book_schema
 from app.constants import errors
+from app.utils.parse_date import parse_date
 
 books_bp = Blueprint("books", __name__)
 
@@ -224,12 +225,3 @@ def delete_book(book_id: int):
     db.session.commit()
 
     return '', 204
-
-
-def parse_date(date_str: str):
-    """Parse a date string into a datetime object"""
-    from datetime import datetime
-    try:
-        return datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        raise ValueError(errors.INVALID_DATE_FORMAT)
