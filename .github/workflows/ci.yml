@@ -25,8 +25,8 @@ jobs:
 
             - name: Check code formatting
               run: |
-                black --check -l 90 -C -S src
-                flake8 src --max-line-length 90
+                black --check -l 90 -C -S app
+                flake8 app --max-line-length 90
             
             - name: Check unused dependencies with flake8
               run: |
@@ -38,5 +38,5 @@ jobs:
                 pip-audit
             - name: Run tests
               run: |
-                python3 -m pytest --cov=src --cov-fail-under=80 --cov-report html tests/
+                python3 -m pytest --cov=app --cov-fail-under=80 --cov-report html tests/
                 
