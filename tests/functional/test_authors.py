@@ -120,6 +120,15 @@ def test_update_author(client, sample_data):
     assert data['last_name'] == 'Author'
 
 
+def test_update_author_empty_body(client, sample_data):
+    """Test updating an author with an empty body"""
+    author_id = sample_data['authors'][0]
+    response = client.put(f'/api/authors/{author_id}', json={})
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data['first_name'] == 'John'
+
+
 def test_update_author_not_found(client):
     """Test updating a non-existent author"""
     updated_author = {
