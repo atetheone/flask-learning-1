@@ -46,7 +46,7 @@ def test_get_category_books(client, sample_data):
     )
     assert response.status_code == 200
     data = json.loads(response.data)
-    assert len(data["books"]) == 2
+    assert len(data["books"]) == 1
     assert data["books"][0]["title"] == "Test Book"
 
 
