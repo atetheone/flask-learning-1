@@ -38,7 +38,7 @@ def get_categories():
 @categories_bp.route("/<int:category_id>", methods=["GET"])
 def get_category(category_id: int):
     """Get a single category by ID"""
-    category = db.session.query(Category).get(category_id)
+    category = db.session.get(Category, category_id)
     if not category:
         return jsonify({"error": errors.CATEGORY_NOT_FOUND}), 404
 
@@ -48,17 +48,19 @@ def get_category(category_id: int):
 @categories_bp.route("/<int:category_id>/books", methods=["GET"])
 def get_category_books(category_id: int):
     """Get all books in a specific category"""
-    category = db.session.query(Category).get(category_id)
+    category = db.session.get(Category, category_id)
+    # category = db.get_or_404(Category, category_id)
     if not category:
         return jsonify({"error": errors.CATEGORY_NOT_FOUND}), 404
 
     # Paginate books in the category
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    books_query = db.session.query(Book).filter(Category.category_id == category_id)
-
+    books_statement = (
+        db.select(Book).join(Book.categories).filter(Category.category_id == category_id)
+    )
     # Apply pagination
-    pagination = books_query.paginate(page=page, per_page=per_page)
+    pagination = db.paginate(books_statement, page=page, per_page=per_page)
 
     return jsonify(
         {
