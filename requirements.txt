@@ -1,8 +1,8 @@
 flask
-flask-alchemy
 marshmallow
 flask-marshmallow
-marshmallow-alchemy
+marshmallow-sqlalchemy
+flask-sqlalchemy
 flask-jwt-extended
 email-validator
 python-dotenv
