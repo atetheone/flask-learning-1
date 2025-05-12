@@ -1,0 +1,14 @@
+flask
+flask-alchemy
+marshmallow
+flask-marshmallow
+marshmallow-alchemy
+flask-jwt-extended
+email-validator
+python-dotenv
+pytest
+coverage
+pytest-cov
+black
+flake8
+pip-audit
