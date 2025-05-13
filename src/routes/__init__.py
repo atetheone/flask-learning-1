@@ -17,7 +17,7 @@ def register_blueprints(app):
     :param app: The Flask application instance.
     """
 
-    app.register_blueprint(auth_bp, url_prefix="/api/v1")
-    app.register_blueprint(users_bp, url_prefix="/api/v1")
-    app.register_blueprint(posts_bp, url_prefix="/api/v1")
-    app.register_blueprint(comments_bp, url_prefix="/api/v1")
+    app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
+    app.register_blueprint(users_bp, url_prefix="/api/v1/users")
+    app.register_blueprint(posts_bp, url_prefix="/api/v1/posts")
+    app.register_blueprint(comments_bp, url_prefix="/api/v1/comments")
