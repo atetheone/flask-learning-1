@@ -13,3 +13,4 @@ black
 flake8
 pip-audit
 flask-restx
+passlib
