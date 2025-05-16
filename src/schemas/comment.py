@@ -17,10 +17,7 @@ class CommentSchema(ma.SQLAlchemyAutoSchema):
         ordered = True
 
     comment_id = ma.auto_field(dump_only=True)
-    content = fields.String(
-        required=True,
-        validate=validate.Length(min=1, max=1000),
-    )
+    content = fields.String(required=True, validate=validate.Length(min=1, max=1000))
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
     user_id = ma.auto_field(dump_only=True)
@@ -44,8 +41,5 @@ class CommentCreateSchema(ma.Schema):
     Schema for creating a new comment.
     """
 
-    content = fields.String(
-        required=True,
-        validate=validate.Length(min=1, max=1000),
-    )
+    content = fields.String(required=True, validate=validate.Length(min=1, max=1000))
     parent_id = fields.Integer()

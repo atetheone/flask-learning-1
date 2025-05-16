@@ -22,11 +22,7 @@ class PostSchema(ma.SQLAlchemyAutoSchema):
     visibility = fields.String(
         required=True,
         validate=validate.OneOf(
-            [
-                PostVisibility.PUBLIC,
-                PostVisibility.FOLLOWERS,
-                PostVisibility.PRIVATE,
-            ]
+            [PostVisibility.PUBLIC, PostVisibility.FOLLOWERS, PostVisibility.PRIVATE]
         ),
     )
     created_at = fields.DateTime(dump_only=True)
@@ -80,11 +76,7 @@ class PostCreateSchema(ma.Schema):
     visibility = fields.String(
         required=True,
         validate=validate.OneOf(
-            [
-                PostVisibility.PUBLIC,
-                PostVisibility.FOLLOWERS,
-                PostVisibility.PRIVATE,
-            ]
+            [PostVisibility.PUBLIC, PostVisibility.FOLLOWERS, PostVisibility.PRIVATE]
         ),
         default=PostVisibility.PUBLIC,
     )
