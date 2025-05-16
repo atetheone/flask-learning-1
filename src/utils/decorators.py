@@ -16,7 +16,7 @@ def role_required(role=None):
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             identity = get_jwt_identity()
-            user = db.session.get(User, identity["user_id"])
+            user = db.session.get(User, identity)
             if not user or (role and user.role != role):
                 required = f"{role} access required" if role else "User access required"
                 return jsonify({"error": required}), 403

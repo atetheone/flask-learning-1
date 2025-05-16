@@ -2,7 +2,7 @@
 This file imports all the models used in the application.
 """
 
-from src.models.user import User, UserRole, TokenBlocklist
+from src.models.user import User, Role, TokenBlocklist
 from src.models.post import Post, Like, PostVisibility
 from src.models.comment import Comment
 from src.models.relationship import Relationship
@@ -15,5 +15,5 @@ _ = (
     Comment,
     Relationship,
     TokenBlocklist,
-    UserRole,
+    Role,
 )  # noqa: F841 # to avoid unused import warnings

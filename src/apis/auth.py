@@ -14,7 +14,7 @@ from flask_jwt_extended import (
 )
 from src.schemas import user_schema, user_auth_schema
 from src import db
-from src.models import User, TokenBlacklist
+from src.models import User, TokenBlocklist
 
 
 auth_ns = Namespace('auth', description='Authentication operations')
@@ -239,7 +239,7 @@ class Logout(Resource):
         jti = jwt_payload["jti"]
 
         # Add the jti to the blacklist
-        blacklisted_token = TokenBlacklist(jti=jti)
+        blacklisted_token = TokenBlocklist(jti=jti)
 
         db.session.add(blacklisted_token)
         db.session.commit()

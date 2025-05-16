@@ -1,6 +1,6 @@
 from src import ma
 from src.models import User
-from marshmallow import fields, validate, validates, ValidationError
+from marshmallow import fields, validate, validates, ValidationError, post_dump
 import re
 
 
@@ -15,6 +15,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
         model = User
         ordered = True
+        exclude = ("password",)  # Exclude password from serialization
 
     user_id = ma.auto_field(dump_only=True)
     username = fields.String(required=True)
@@ -75,14 +76,19 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
             raise ValidationError("Email is already taken.")
 
     # Add links for HATEOAS: Hypermedia as the Engine of Application State
-    _links = ma.Hyperlinks(
-        {
-            "self": ma.URLFor("user", user_id="<user_id>"),
-            "posts": ma.URLFor("user_posts", user_id="<user_id>"),
-            "followers": ma.URLFor("user_followers", user_id="<user_id>"),
-            "following": ma.URLFor("user_following", user_id="<user_id>"),
-        }
-    )
+    @post_dump
+    def format_links(self, data, **kwargs):
+        """
+        Format the links for the user schema.
+        """
+        if "user_id" in data:
+            data["_links"] = {
+                "self": f"/users/{data['user_id']}",
+                "posts": f"/users/{data['user_id']}/posts",
+                "followers": f"/users/{data['user_id']}/followers",
+                "following": f"/users/{data['user_id']}/following",
+            }
+        return data
 
 
 class UserAuthSchema(ma.Schema):
@@ -140,11 +146,16 @@ class UserProfileSchema(ma.SQLAlchemyAutoSchema):
             return current_user.is_following(obj)
         return False
 
-    _links = ma.Hyperlinks(
-        {
-            "self": ma.URLFor("user_profile", user_id="<user_id>"),
-            "followers": ma.URLFor("users.get_followers", user_id="<user_id>"),
-            "following": ma.URLFor("users.get_following", user_id="<user_id>"),
-            "posts": ma.URLFor("users.get_user_posts", user_id="<user_id>"),
-        }
-    )
+    @post_dump
+    def format_links(self, data, **kwargs):
+        """
+        Format the links for the user profile schema.
+        """
+        if "user_id" in data:
+            data["_links"] = {
+                "self": f"/users/{data['user_id']}",
+                "followers": f"/users/{data['user_id']}/followers",
+                "following": f"/users/{data['user_id']}/following",
+                "posts": f"/users/{data['user_id']}/posts",
+            }
+        return data

@@ -1,6 +1,6 @@
 from src import ma
 from src.models import Comment
-from marshmallow import fields, validate
+from marshmallow import fields, validate, post_dump
 
 
 class CommentSchema(ma.SQLAlchemyAutoSchema):
@@ -27,13 +27,18 @@ class CommentSchema(ma.SQLAlchemyAutoSchema):
     author = fields.Nested('UserProfileSchema', dump_only=True)
     replies = fields.List(fields.Nested('CommentSchema'), dump_only=True)
 
-    _links = ma.Hyperlinks(
-        {
-            "self": ma.URLFor("comments.get_comment", comment_id="<comment_id>"),
-            "post": ma.URLFor("posts.get_post", post_id="<post_id>"),
-            "replies": ma.URLFor("comments.get_replies", comment_id="<comment_id>"),
-        }
-    )
+    @post_dump
+    def format_links(self, data, **kwargs):
+        """
+        Format the links for the comment schema.
+        """
+        if "comment_id" in data:
+            data["_links"] = {
+                "self": f"/comments/{data['comment_id']}",
+                "post": f"/posts/{data['post_id']}",
+                "replies": f"/comments/{data['comment_id']}/replies",
+            }
+        return data
 
 
 class CommentCreateSchema(ma.Schema):

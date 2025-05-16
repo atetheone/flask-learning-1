@@ -3,8 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flask_restx import Api
-from config import config
-from src.models import User, Post, Comment
+from config import config_by_name
 
 # Initialize Flask extensions
 db = SQLAlchemy()
@@ -29,7 +28,7 @@ def create_app(config_name='default'):
     app = Flask(__name__)
 
     # Load the configuration from the specified config name
-    app.config.from_object(config[config_name])
+    app.config.from_object(config_by_name[config_name])
 
     # Initialize extensions with the app context
     db.init_app(app)
@@ -38,7 +37,7 @@ def create_app(config_name='default'):
     api.init_app(app)
 
     # JWT configuration
-    from src.models import TokenBlacklist
+    from src.models import TokenBlocklist
 
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blacklist(jwt_header, jwt_payload):
@@ -51,7 +50,7 @@ def create_app(config_name='default'):
         :return: True if the token is in the blacklist, False otherwise.
         """
         jti = jwt_payload['jti']
-        return TokenBlacklist.is_jti_blacklisted(jti)
+        return TokenBlocklist.is_jti_blacklisted(jti)
 
     # JWT error handlers
     @jwt.expired_token_loader
@@ -98,8 +97,10 @@ def create_app(config_name='default'):
         }, 401
 
     # Register blueprints here if needed
-    from apis import register_namespaces
+    from src.apis import register_namespaces
     register_namespaces(api)
+
+    from src.models import User, Post, Comment
 
     @app.shell_context_processor
     def make_shell_context():
@@ -113,7 +114,7 @@ def create_app(config_name='default'):
             'User': User,
             'Post': Post,
             'Comment': Comment,
-            'TokenBlacklist': TokenBlacklist,
+            'TokenBlacklist': TokenBlocklist,
         }
 
     return app

@@ -44,7 +44,7 @@ class User(db.Model):
     posts = db.relationship(
         "Post", backref="author", lazy='dynamic', cascade="all, delete-orphan"
     )
-    comments = db.relashionship(
+    comments = db.relationship(
         "Comment", backref="author", lazy='dynamic', cascade="all, delete-orphan"
     )
     followers = db.relationship(

@@ -1,6 +1,6 @@
 from src import ma
 from src.models import Post, PostVisibility
-from marshmallow import fields, validate
+from marshmallow import fields, validate, post_dump
 from src.schemas import UserProfileSchema
 
 
@@ -58,13 +58,18 @@ class PostSchema(ma.SQLAlchemyAutoSchema):
 
     authors = fields.Nested(UserProfileSchema, dump_only=True, many=True)
 
-    _links = ma.Hyperlinks(
-        {
-            "self": ma.URLFor("posts.get_post", post_id="<post_id>"),
-            "comments": ma.URLFor("posts.get_comments", post_id="<post_id>"),
-            "likes": ma.URLFor("posts.get_likes", post_id="<post_id>"),
-        }
-    )
+    @post_dump
+    def format_links(self, data, **kwargs):
+        """
+        Format the links for the post schema.
+        """
+        if "post_id" in data:
+            data["_links"] = {
+                "self": f"/posts/{data['post_id']}",
+                "comments": f"/posts/{data['post_id']}/comments",
+                "likes": f"/posts/{data['post_id']}/likes",
+            }
+        return data
 
 
 class PostCreateSchema(ma.Schema):
