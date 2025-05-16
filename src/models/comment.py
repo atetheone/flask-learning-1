@@ -29,9 +29,7 @@ class Comment(db.Model):
 
     # self referencing relationship for nested comments
     replies = db.relationship(
-        "Comment",
-        backref=db.backref("parent", remote_side=[comment_id]),
-        lazy="dynamic",
+        "Comment", backref=db.backref("parent", remote_side=[comment_id]), lazy="dynamic"
     )
 
     def __repr__(self):

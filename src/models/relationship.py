@@ -2,6 +2,7 @@
 This module defines the Relationship class, which represents a relationship
 between two users in the social media application.
 """
+
 from src import db
 from datetime import datetime, timezone
 

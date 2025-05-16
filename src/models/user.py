@@ -42,23 +42,17 @@ class User(db.Model):
 
     # Relationships
     posts = db.relationship(
-        "Post",
-        backref="author",
-        lazy='dynamic',
-        cascade="all, delete-orphan"
+        "Post", backref="author", lazy='dynamic', cascade="all, delete-orphan"
     )
     comments = db.relashionship(
-        "Comment",
-        backref="author",
-        lazy='dynamic',
-        cascade="all, delete-orphan"
+        "Comment", backref="author", lazy='dynamic', cascade="all, delete-orphan"
     )
     followers = db.relationship(
         "User",
         secondary="followers",
         primaryjoin=('User.user_id == Relationship.follower_id'),
         secondaryjoin=('User.user_id == Relationship.followed_id'),
-        backref=db.backref("following", lazy="dynamic")
+        backref=db.backref("following", lazy="dynamic"),
     )
 
     @property
@@ -91,9 +85,9 @@ class User(db.Model):
 
         if not self.is_following(user):
             from src.models.relationship import Relationship
+
             relationship = Relationship(
-                follower_id=self.user_id,
-                followed_id=user.user_id
+                follower_id=self.user_id, followed_id=user.user_id
             )
             db.session.add(relationship)
 
@@ -104,9 +98,9 @@ class User(db.Model):
 
         if self.is_following(user):
             from src.models.relationship import Relationship
+
             relationship = Relationship.query.filter_by(
-                follower_id=self.user_id,
-                followed_id=user.user_id
+                follower_id=self.user_id, followed_id=user.user_id
             ).first()
             db.session.delete(relationship)
 
@@ -115,10 +109,13 @@ class User(db.Model):
         Checks if the user is following another user.
         """
         from src.models.relationship import Relationship
-        return Relationship.query.filter_by(
-            follower_id=self.user_id,
-            followed_id=user.user_id
-        ).count() > 0
+
+        return (
+            Relationship.query.filter_by(
+                follower_id=self.user_id, followed_id=user.user_id
+            ).count()
+            > 0
+        )
 
     def get_followers_count(self):
         """
@@ -126,6 +123,7 @@ class User(db.Model):
         """
 
         from src.models.relationship import Relationship
+
         return Relationship.query.filter_by(followed_id=self.user_id).count()
 
     def get_following_count(self):
@@ -134,6 +132,7 @@ class User(db.Model):
         """
 
         from src.models.relationship import Relationship
+
         return Relationship.query.filter_by(follower_id=self.user_id).count()
 
 

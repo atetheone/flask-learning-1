@@ -15,5 +15,5 @@ _ = (
     Comment,
     Relationship,
     TokenBlocklist,
-    UserRole
+    UserRole,
 )  # noqa: F841 # to avoid unused import warnings

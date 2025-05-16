@@ -32,16 +32,10 @@ class Post(db.Model):
 
     # Relationships
     comments = db.relationship(
-        "Comment",
-        backref="post",
-        lazy="dynamic",
-        cascade="all, delete-orphan",
+        "Comment", backref="post", lazy="dynamic", cascade="all, delete-orphan"
     )
     likes = db.relationship(
-        "Like",
-        backref="post",
-        lazy="dynamic",
-        cascade="all, delete-orphan",
+        "Like", backref="post", lazy="dynamic", cascade="all, delete-orphan"
     )
 
     def __repr__(self):
@@ -80,9 +74,7 @@ class Like(db.Model):
     def __repr__(self):
         return f"<Like {self.like_id}>"
 
-    __table_args__ = (
-        db.UniqueConstraint("user_id", "post_id", name="unique_like"),
-    )
+    __table_args__ = (db.UniqueConstraint("user_id", "post_id", name="unique_like"),)
 
     # Relationships
     user = db.relationship("User", backref=db.backref("likes", lazy="dynamic"))
